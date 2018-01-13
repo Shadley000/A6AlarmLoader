@@ -17,10 +17,10 @@ import java.sql.SQLException;
  */
 public class AlarmFileController {
 
-    public final static String sql_removeOldFileFromDB = " DELETE from ALARMFILE where ID_INSTALLATION = ? AND ID = ?;";
-    public final static String sql_createNewFileInDB = "insert into ALARMFILE (ID_INSTALLATION, FILE_NAME) values (?,?);";
-    public final static String sql_getFileID = "select ID from ALARMFILE where ID_INSTALLATION = ? AND FILE_NAME = ?;";
-    private final static String sql_Update_File = "UPDATE ALARMFILE SET DATA_LINES=?, DATA_INSERTED=?, DATA_SKIPPED=?, DATA_ERROR=? WHERE ID_INSTALLATION = ? AND ID = ?;";
+    public final static String sql_removeOldFileFromDB = " DELETE from ALARM_FILE where ID_INSTALLATION = ? AND ID = ?;";
+    public final static String sql_createNewFileInDB = "insert into ALARM_FILE (ID_INSTALLATION, FILE_NAME) values (?,?);";
+    public final static String sql_getFileID = "select ID from ALARM_FILE where ID_INSTALLATION = ? AND FILE_NAME = ?;";
+    private final static String sql_Update_File = "UPDATE ALARM_FILE SET LINES_COUNT=?, INSERTED_COUNT=?, SKIPPED_COUNT=?, ERROR_COUNT=? WHERE ID_INSTALLATION = ? AND ID = ?;";
 
     PreparedStatement stmt_getFileID = null;
     PreparedStatement stmt_removeOldFileFromDB = null;

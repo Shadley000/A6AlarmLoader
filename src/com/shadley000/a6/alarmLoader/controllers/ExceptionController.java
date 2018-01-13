@@ -15,9 +15,9 @@ import java.sql.SQLException;
  */
 public class ExceptionController {
 
-    private final static String sql_removeOldErrorsFromDB = "DELETE from ERRORLOG where ID_INSTALLATION = ? AND ID_FILE = ?;";
+    private final static String sql_removeOldErrorsFromDB = "DELETE from ERROR_LOG where ID_INSTALLATION = ? AND ID_ALARM_FILE = ?;";
 
-    private final static String sql_InsertError = "insert into ERRORLOG (ID_INSTALLATION, ID_FILE, ERROR_MESSAGE, ORIGINAL_TEXT, LINENUMBER) values (?,?,?,?,?);";
+    private final static String sql_InsertError = "insert into ERROR_LOG (ID_INSTALLATION, ID_ALARM_FILE, ERROR_MESSAGE, LINE_NUMBER) values (?,?,?,?);";
     private PreparedStatement stmt_removeOldErrorsFromDB = null;
     private PreparedStatement stmt_logError = null;
 
@@ -39,8 +39,7 @@ public class ExceptionController {
         stmt_logError.setInt(1, installationID);
         stmt_logError.setInt(2, fileID);
         stmt_logError.setString(3, message);
-        stmt_logError.setString(4, text);
-        stmt_logError.setInt(5, lineNum);
+        stmt_logError.setInt(4, lineNum);
         stmt_logError.execute();
     }
 }

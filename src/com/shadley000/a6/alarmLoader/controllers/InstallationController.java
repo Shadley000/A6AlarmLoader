@@ -17,7 +17,7 @@ import java.sql.SQLException;
  */
 public class InstallationController {
 
-    private final static String sql_selectInstallationID = "SELECT ID,ID_VENDOR,ID_SHIP,ID_CONTRACTOR,NNAME,DATADIRECTORY,PARSERNAME from INSTALLATION where DATADIRECTORY = ?;";
+    private final static String sql_selectInstallationID = "SELECT ID,ID_VENDOR,ID_SHIP,ID_CONTRACTOR,NNAME,DATA_DIRECTORY,PARSER_NAME from INSTALLATION where DATA_DIRECTORY = ?;";
     PreparedStatement stmt_getInstallationID = null;
 
     public InstallationController(Connection connection) throws SQLException {

@@ -17,12 +17,12 @@ import java.sql.Timestamp;
  */
 public class AlarmRecordController {
 
-    public final static String sql_InsertAlarm = "INSERT INTO ALARMLOAD "
-            + "(ID_INSTALLATION, ID_FILE, ALARMTIME, SYSTEM,  SUBSYSTEM, MESSAGETYPE, TAGNAME, PRIORITY, ALARMSTATUS, DESCRIPTION ) "
+    public final static String sql_InsertAlarm = "INSERT INTO ALARM_STAGING "
+            + "(ID_INSTALLATION, ID_ALARM_FILE, ALARM_TIME, SYSTEM,SUBSYSTEM, MESSAGE_TYPE, TAG_NAME, ALARM_PRIORITY, ALARM_STATUS, DESCRIPTION ) "
             + "VALUES (?,?,?,?,?, ?,?,?,?,?); ";
 
-    public final static String sql_removeOldRawDataFromDB = " DELETE from ALARMLOAD where ID_FILE = ?;";
-    public final static String sql_removeOldAlarmDataFromDB = " DELETE from ALARMDATA where ID_FILE = ?;";
+    public final static String sql_removeOldRawDataFromDB = " DELETE from ALARM_STAGING where ID_ALARM_FILE = ?;";
+    public final static String sql_removeOldAlarmDataFromDB = " DELETE from ALARM_DATA where ID_ALARM_FILE = ?;";
 
     PreparedStatement stmt_InsertAlarm = null;
     PreparedStatement stmt_removeOldRawDataFromDB = null;
