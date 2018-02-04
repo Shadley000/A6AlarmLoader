@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 public class AlarmRecordController {
 
     public final static String sql_InsertAlarm = "INSERT INTO ALARM_STAGING "
-            + "(ID_INSTALLATION, ID_ALARM_FILE, ALARM_TIME, SYSTEM,SUBSYSTEM, MESSAGE_TYPE, TAG_NAME, ALARM_PRIORITY, ALARM_STATUS, DESCRIPTION ) "
+            + "(ID_INSTALLATION, ID_ALARM_FILE, ALARM_TIME, ALARM_DATE, SYSTEM,SUBSYSTEM, MESSAGE_TYPE, TAG_NAME, ALARM_PRIORITY, ALARM_STATUS, DESCRIPTION ) "
             + "VALUES (?,?,?,?,?, ?,?,?,?,?); ";
 
     public final static String sql_removeOldRawDataFromDB = " DELETE from ALARM_STAGING where ID_ALARM_FILE = ?;";
@@ -46,13 +46,14 @@ public class AlarmRecordController {
         stmt_InsertAlarm.setInt(1, alarmRecord.getInstallationID());
         stmt_InsertAlarm.setInt(2, alarmRecord.getFileID());
         stmt_InsertAlarm.setTimestamp(3, new Timestamp(alarmRecord.getAlarmTime().getTime()));
-        stmt_InsertAlarm.setString(4, alarmRecord.getSystem());
-        stmt_InsertAlarm.setString(5, alarmRecord.getSubSystem());
-        stmt_InsertAlarm.setString(6, alarmRecord.getMessageType());
-        stmt_InsertAlarm.setString(7, alarmRecord.getTagName());
-        stmt_InsertAlarm.setString(8, alarmRecord.getPriority());
-        stmt_InsertAlarm.setString(9, alarmRecord.getStatus());
-        stmt_InsertAlarm.setString(10, alarmRecord.getDescription());
+        stmt_InsertAlarm.setDate(4, new java.sql.Date(alarmRecord.getAlarmTime().getTime()));
+        stmt_InsertAlarm.setString(5, alarmRecord.getSystem());
+        stmt_InsertAlarm.setString(6, alarmRecord.getSubSystem());
+        stmt_InsertAlarm.setString(7, alarmRecord.getMessageType());
+        stmt_InsertAlarm.setString(8, alarmRecord.getTagName());
+        stmt_InsertAlarm.setString(9, alarmRecord.getPriority());
+        stmt_InsertAlarm.setString(10, alarmRecord.getStatus());
+        stmt_InsertAlarm.setString(11, alarmRecord.getDescription());
         stmt_InsertAlarm.execute();
     }
 

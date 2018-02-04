@@ -11,6 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -52,6 +57,7 @@ public class AlarmRecordBean implements Serializable {
 
     public void setAlarmTime(java.util.Date d) {
         almTime = d;
+        
     }
 
     public void setSystem(String s) {
