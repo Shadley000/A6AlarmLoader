@@ -1,5 +1,6 @@
 package com.shadley000.a6.alarmLoader;
 
+import com.shadley000.a6.alarmLoader.controllers.PivotController;
 import com.shadley000.a6.alarmLoader.controllers.AlarmFileController;
 import com.shadley000.a6.alarmLoader.controllers.ExceptionController;
 import com.shadley000.a6.alarmLoader.controllers.AlarmRecordController;
@@ -25,13 +26,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import static java.lang.System.getProperties;
 import java.sql.DriverManager;
+import java.sql.Statement;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,17 +44,18 @@ public class ReadToDatabase {
     ExceptionController exceptionController;
     AlarmRecordController alarmRecordController;
     InstallationController installationController;
+    PivotController pivotController;
 
     PreparedStatement stmt_getVendorID = null;
 
-   // static PrintStream skippedOut = null;
-
+    // static PrintStream skippedOut = null;
     public ReadToDatabase(Connection connection) throws Exception {
 
         alarmFileController = new AlarmFileController(connection);
         exceptionController = new ExceptionController(connection);
         alarmRecordController = new AlarmRecordController(connection);
         installationController = new InstallationController(connection);
+        pivotController = new PivotController(connection);
     }
 
     public static void main(String args[]) {
@@ -67,19 +71,19 @@ public class ReadToDatabase {
 
         Properties properties = new Properties();
         try {
-            
+
             properties.load(new FileReader(propertiesFileName));
             Class.forName(properties.getProperty("driver"));
             System.out.println("Connecting to database");
-            System.out.println("\turl:"+properties.getProperty("url"));
-            System.out.println("\tuser:"+properties.getProperty("user"));
-            System.out.println("\tpassword"+properties.getProperty("password"));
-            connection = DriverManager.getConnection(properties.getProperty("url"), properties.getProperty("user"),properties.getProperty("password"));
+            System.out.println("\turl:" + properties.getProperty("url"));
+            System.out.println("\tuser:" + properties.getProperty("user"));
+            System.out.println("\tpassword" + properties.getProperty("password"));
+            connection = DriverManager.getConnection(properties.getProperty("url"), properties.getProperty("user"), properties.getProperty("password"));
         } catch (Exception ex) {
             Logger.getLogger(ReadToDatabase.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
-        
+
         System.out.println("Loading alarm files from directory " + directory);
         File InstallationsDirectory = new File(directory);
 
@@ -109,6 +113,8 @@ public class ReadToDatabase {
     }
 
     public void loadInstallationDirectory(InstallationBean installationBean, File installationFile) {
+        Set<String> dateSet = new HashSet<>();
+
         try {
             System.out.println("Loading Installation " + installationBean.getName() + " " + installationBean.getId());
 
@@ -121,7 +127,7 @@ public class ReadToDatabase {
                     System.out.println("importing  " + importFile.getAbsolutePath());
 
                     try {
-                        importToDatabase(installationBean, importFile.getAbsolutePath());
+                        importToDatabase(installationBean, importFile.getAbsolutePath(), dateSet);
 
                         Path source = FileSystems.getDefault().getPath(importFile.getParent(), fileName);
                         Path target = FileSystems.getDefault().getPath(importFile.getParent() + "/archive/", fileName);
@@ -139,8 +145,10 @@ public class ReadToDatabase {
         }
     }
 
-    public void importToDatabase(InstallationBean installationBean, String fileName) throws FileFormatException, FileNotFoundException, IOException, SQLException, LoadFileException {
+    public void importToDatabase(InstallationBean installationBean, String fileName, Set dateSet)
+            throws FileFormatException, FileNotFoundException, IOException, SQLException, LoadFileException {
 
+        SimpleDateFormat dateStrFormat = new SimpleDateFormat("yyyy-MM-dd");
         removeOldFileFromDB(installationBean.getId(), fileName);
 
         File csvFile = new File(fileName);
@@ -169,7 +177,7 @@ public class ReadToDatabase {
                         columnMap = KMLine.findHeaderFormat(csvLine);
                     }
                     fileID = alarmFileController.createNewFileInDB(installationBean.getId(), csvFile.getName());
-     
+
                 } catch (ParseException e) {
                     throw new FileFormatException("Fatal file format exception:" + e.getClass().getName() + " " + e.getMessage());
                 }
@@ -190,6 +198,7 @@ public class ReadToDatabase {
                         alarm.setFileID(fileID);
                         alarmRecordController.createAlarmRecord(alarm);
                         outputCount++;
+                        dateSet.add(dateStrFormat.format(alarm.getAlarmTime()));
                     }
 
                 } catch (HeaderLineException e) {
@@ -208,9 +217,19 @@ public class ReadToDatabase {
         }
         reader.close();
 
+        System.out.println("Updating File Data");
         alarmFileController.updateFileData(installationID, fileID, lineNum, outputCount, skippedCount, exceptionCount);
 
-        System.out.println(outputCount + " records inserted, " + skippedCount + " skipped " + exceptionCount + " errors");
+        System.out.println("Loading from staging to data");
+        alarmRecordController.loadStagingToData( installationID);
+        
+        System.out.println("Updating Pivots");
+        pivotController.updatePivots(installationBean, dateSet);
+
+        System.out.println("Generating calculated Rows");
+        pivotController.generateCalculatedRows(installationBean, dateSet);
+
+        System.out.println("Completed " + fileName + "  " + outputCount + " records inserted, " + skippedCount + " skipped " + exceptionCount + " errors");
     }
 
     public void removeOldFileFromDB(int installationID, String filename) throws SQLException {

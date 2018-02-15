@@ -40,7 +40,7 @@ public class AlarmFileController {
         ResultSet rs = stmt_getFileID.executeQuery();
 
         if (rs.next()) {
-            int fileID = rs.getInt(1);
+            return rs.getInt(1);
         }
         return null;
     }

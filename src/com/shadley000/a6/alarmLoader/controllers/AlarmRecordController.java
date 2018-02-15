@@ -19,19 +19,22 @@ public class AlarmRecordController {
 
     public final static String sql_InsertAlarm = "INSERT INTO ALARM_STAGING "
             + "(ID_INSTALLATION, ID_ALARM_FILE, ALARM_TIME, ALARM_DATE, SYSTEM,SUBSYSTEM, MESSAGE_TYPE, TAG_NAME, ALARM_PRIORITY, ALARM_STATUS, DESCRIPTION ) "
-            + "VALUES (?,?,?,?,?, ?,?,?,?,?); ";
+            + "VALUES (?,?,?,?,?, ?,?,?,?,?, ?); ";
 
     public final static String sql_removeOldRawDataFromDB = " DELETE from ALARM_STAGING where ID_ALARM_FILE = ?;";
     public final static String sql_removeOldAlarmDataFromDB = " DELETE from ALARM_DATA where ID_ALARM_FILE = ?;";
+ public final static String sql_LoadFromStaging = " CALL a6alarms.LOAD_FROM_STAGING();";
 
     PreparedStatement stmt_InsertAlarm = null;
     PreparedStatement stmt_removeOldRawDataFromDB = null;
     PreparedStatement stmt_removeOldAlarmDataFromDB = null;
+    PreparedStatement stmt_LoadFromStaging = null;
 
     public AlarmRecordController(Connection connection) throws SQLException {
         stmt_InsertAlarm = connection.prepareStatement(sql_InsertAlarm);
         stmt_removeOldRawDataFromDB = connection.prepareStatement(sql_removeOldRawDataFromDB);
         stmt_removeOldAlarmDataFromDB = connection.prepareStatement(sql_removeOldAlarmDataFromDB);
+        stmt_LoadFromStaging = connection.prepareStatement(sql_LoadFromStaging);
     }
 
     public void deleteAlarmRecords(int fileid) throws SQLException {
@@ -57,4 +60,8 @@ public class AlarmRecordController {
         stmt_InsertAlarm.execute();
     }
 
+    public void loadStagingToData(int installationID) throws SQLException
+    {
+        stmt_LoadFromStaging.execute();
+    }
 }
