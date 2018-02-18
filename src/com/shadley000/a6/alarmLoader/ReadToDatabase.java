@@ -116,6 +116,7 @@ public class ReadToDatabase {
         Set<String> dateSet = new HashSet<>();
 
         try {
+             System.out.println("********************************************************************");
             System.out.println("Loading Installation " + installationBean.getName() + " " + installationBean.getId());
 
             String[] importFileList = installationFile.list();
@@ -124,6 +125,7 @@ public class ReadToDatabase {
                 File importFile = new File(installationFile.getAbsoluteFile() + "/" + fileName);
 
                 if (importFile.isFile() && (fileName.endsWith(".csv") || fileName.endsWith(".CSV"))) {
+                    System.out.println("-----------------------------------------------------------------------");
                     System.out.println("importing  " + importFile.getAbsolutePath());
 
                     try {
@@ -137,6 +139,7 @@ public class ReadToDatabase {
                     } catch (Exception e) {
                         e.printStackTrace(System.out);
                     }
+                    System.out.println();
                 }
             }
 
