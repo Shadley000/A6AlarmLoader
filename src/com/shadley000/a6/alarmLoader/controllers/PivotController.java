@@ -83,11 +83,11 @@ public class PivotController {
 
     public void updatePivots(InstallationBean installationBean, Set<String> dateSet) throws SQLException {
         for (String aDate : dateSet) {
-            
+
             stmt_CleanPivotData.setInt(1, installationBean.getId());
             stmt_CleanPivotData.setString(2, aDate);
             stmt_CleanPivotData.execute();
-                    
+
             stmt_CallPivotUpdate.setString(1, aDate);
             stmt_CallPivotUpdate.setInt(2, installationBean.getId());
             stmt_CallPivotUpdate.execute();
@@ -136,14 +136,14 @@ public class PivotController {
                     }
                 } else {
                     ACS_AUX_STOP_count++;
-                }
-                if (isAM) {
-                    ACS_AUX_AM_STOP_count++;
-                } else {
-                    ACS_AUX_PM_STOP_count++;
+
+                    if (isAM) {
+                        ACS_AUX_AM_STOP_count++;
+                    } else {
+                        ACS_AUX_PM_STOP_count++;
+                    }
                 }
             }
-
             insertPivotRow(installationID, aDate, "ACS_MAIN_STOP", ACS_MAIN_STOP_count);
             insertPivotRow(installationID, aDate, "ACS_MAIN_AM_STOP", ACS_MAIN_AM_STOP_count);
             insertPivotRow(installationID, aDate, "ACS_MAIN_PM_STOP", ACS_MAIN_PM_STOP_count);
@@ -159,25 +159,22 @@ public class PivotController {
             insertPivotRow(installationID, aDate, "HR2_CALIBRATION", getCount(stmt_SelectHR1Rows, installationID, aDate, "HR2"));
             insertPivotRow(installationID, aDate, "DW1_BRAKE", getCount(stmt_SelectDWRows, installationID, aDate, "DW1"));
             insertPivotRow(installationID, aDate, "DW2_BRAKE", getCount(stmt_SelectDWRows, installationID, aDate, "DW2"));
-
         }
-
     }
 
     protected void insertPivotRow(int installationID, String aDate, String tagName, int count) throws SQLException {
         if (count == 0) {
             return;
         }
-        if(calculatedRowIDs.get(tagName)==null)
-        {
-            System.out.println("Custom Calculated tage missing:"+tagName);
+        if (calculatedRowIDs.get(tagName) == null) {
+            System.out.println("Custom Calculated tage missing:" + tagName);
+        } else {
+            stmt_InsertPivotRow.setInt(1, installationID);
+            stmt_InsertPivotRow.setInt(2, calculatedRowIDs.get(tagName));
+            stmt_InsertPivotRow.setInt(3, count);
+            stmt_InsertPivotRow.setString(4, aDate);
+            stmt_InsertPivotRow.execute();
         }
-        else{
-        stmt_InsertPivotRow.setInt(1, installationID);
-        stmt_InsertPivotRow.setInt(2, calculatedRowIDs.get(tagName));
-        stmt_InsertPivotRow.setInt(3, count);
-        stmt_InsertPivotRow.setString(4, aDate);
-        stmt_InsertPivotRow.execute();}
     }
 
     protected int getCount(PreparedStatement stmt, int installationID, String aDate, String subSystem) throws SQLException {
