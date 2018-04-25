@@ -167,7 +167,7 @@ public class PivotController {
             return;
         }
         if (calculatedRowIDs.get(tagName) == null) {
-            System.out.println("Custom Calculated tage missing:" + tagName);
+            System.out.println("Custom Calculated tag missing:" + tagName);
         } else {
             stmt_InsertPivotRow.setInt(1, installationID);
             stmt_InsertPivotRow.setInt(2, calculatedRowIDs.get(tagName));
